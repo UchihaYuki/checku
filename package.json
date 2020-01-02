@@ -1,0 +1,39 @@
+{
+  "name": "checku",
+  "version": "0.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "prepublishOnly": "gulp prepublish",
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UchihaYuki/checku.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UchihaYuki/checku/issues"
+  },
+  "homepage": "https://github.com/UchihaYuki/checku#readme",
+  "devDependencies": {
+    "@types/bson": "^4.0.1",
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
+    "del": "^5.1.0",
+    "gulp": "^4.0.2",
+    "gulp-mocha": "^7.0.2",
+    "gulp-tsb": "^4.0.5",
+    "mocha": "^6.2.2",
+    "reflect-metadata": "^0.1.13",
+    "typescript": "^3.7.4"
+  },
+  "dependencies": {
+    "bson": "^4.0.2",
+    "weakmap-polyfill": "^2.0.0",
+    "es6-symbol": "^3.1.3"
+  }
+}

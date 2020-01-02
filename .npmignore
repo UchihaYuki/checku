@@ -1,0 +1,9 @@
+.vscode
+node_modules
+test
+gulpfile.js
+src
+tsconfig.json
+.gitignore
+.npmignore
+package-lock.json
