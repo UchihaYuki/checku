@@ -4,10 +4,10 @@
     "noImplicitAny": true,
     "module": "commonjs",
     "sourceMap": true,
+    "declaration": false,
     "typeRoots": ["../node_modules/@types"],
-    "rootDir": "."
   },
   "include": [
-    "index.ts"
+    "**/*.ts"
   ]
 }

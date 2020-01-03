@@ -5,10 +5,9 @@
     "module": "commonjs",
     "sourceMap": false,
     "declaration": true,
-    "typeRoots": ["../node_modules/@types"],
-    "rootDir": "."
+    "typeRoots": ["../node_modules/@types"]
   },
   "include": [
-    "index.ts"
+    "**/*.ts"
   ]
 }

@@ -1,7 +1,7 @@
 import * as bson from 'bson';
 import 'reflect-metadata';
-import 'weakmap-polyfill';
-import 'es6-symbol/implement';
+// import 'weakmap-polyfill';
+// import 'es6-symbol/implement';
 
 const prototype_propertyKeys = new WeakMap<Object, (string | symbol)[]>();
 

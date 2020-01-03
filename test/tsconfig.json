@@ -4,12 +4,10 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "module": "commonjs",
-    "types": ["node", "mocha"],
     "typeRoots": ["../node_modules/@types"],
-    "rootDir": "../.",
     "experimentalDecorators": true,
   },
   "include": [
-    "test.ts"
+    "**/*.ts"
   ]
 }
