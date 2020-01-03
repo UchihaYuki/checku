@@ -7,15 +7,13 @@ const prototype_propertyKeys = new WeakMap<Object, (string | symbol)[]>();
 
 const validatorMetadataKey = Symbol("validator");
 
-export function validator(rule: Rule) {
+export function validator(rule: Rule | string) {
     return (target: Object, propertyKey: string | symbol) => {
         const pks = prototype_propertyKeys.get(target);
-        if (pks)
-        {
+        if (pks) {
             pks.push(propertyKey)
         }
-        else
-        {
+        else {
             prototype_propertyKeys.set(target, [propertyKey])
         }
         Reflect.defineMetadata(validatorMetadataKey, rule, target, propertyKey)
@@ -29,8 +27,7 @@ function getValidator(target: any, propertyKey: string | symbol) {
 function _validate(key: string | symbol, value: any, rule: Rule) {
     // console.debug(`key=${String(key)} value=${value} rule=${JSON.stringify(rule)}`)
 
-    if (rule.required != false)
-    {
+    if (rule.required != false) {
         if (value == undefined || value == null) throw new ValidationError(key, value, ValidationErrorType.Required, rule)
     }
 
@@ -60,7 +57,7 @@ function _validate(key: string | symbol, value: any, rule: Rule) {
             if (bson.serialize(value).length > rule.bsonBytes) throw new ValidationError(key, value, ValidationErrorType.Bsonbytes, rule)
         } catch (err) {
             throw new ValidationError(key, value, ValidationErrorType.Bsonbytes, rule)
-        }        
+        }
     }
 
     return value;
@@ -68,20 +65,31 @@ function _validate(key: string | symbol, value: any, rule: Rule) {
 
 export function validate(type: Function, instance: any) {
     const pks = prototype_propertyKeys.get(type.prototype)
-    
-    if (!pks)
-    {
+
+    if (!pks) {
         return instance;
     }
-    
+
     const validatedInstance: any = {};
     for (const pk of pks) {
         const value = instance[pk]
-        const rule = getValidator(type.prototype, pk);
+        let rule = getValidator(type.prototype, pk);        
+        if (typeof rule == 'string')
+        {
+            rule = rules[rule]
+            if (rule == undefined) throw new ValidationError(pk, value, ValidationErrorType.NoRule, undefined);
+        }
+
         const t = _validate(pk, value, rule);
         validatedInstance[pk] = t;
     }
     return Object.assign(instance, validatedInstance)
+}
+
+const rules: { [name: string]: Rule } = {};
+
+export function addRule(name: string, rule: Rule) {
+    rules[name] = rule;
 }
 
 export class Rule {
@@ -93,23 +101,22 @@ export class Rule {
     required?: boolean;
 }
 
-export class ValidationError extends Error{
+export class ValidationError extends Error {
     constructor(
-        public key: string | symbol, 
-        public value: any, 
-        public type: ValidationErrorType, 
-        public rule: Rule)
-    {
+        public key: string | symbol,
+        public value: any,
+        public type: ValidationErrorType,
+        public rule: Rule) {
         super(`ValidationError`)
     }
 }
 
-export enum ValidationErrorType
-{
+export enum ValidationErrorType {
     MinLength,
     MaxLength,
     Pattern,
     Bsonbytes,
     Required,
     Type,
+    NoRule,
 }

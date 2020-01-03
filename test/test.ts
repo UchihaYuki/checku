@@ -1,4 +1,4 @@
-import { validator, validate, ValidationError, ValidationErrorType } from '../src/index';
+import { validator, validate, ValidationError, ValidationErrorType, addRule } from '../src/index';
 import { assert } from 'chai';
 
 describe("test checku", () => {
@@ -158,5 +158,41 @@ describe("test checku", () => {
             e = err
         }
         assert(e && e.type == ValidationErrorType.Type, e ? ValidationErrorType[e.type] : "no ValidationError")
+    });
+
+    it("named rule", () => {        
+        addRule("email", { pattern: /^\S+@\S+\.\S+$/, maxLength: 30, trim: true })
+        class Customer
+        {
+            @validator("email")
+            email: string;
+        }
+        const c = new Customer();
+        c.email = "200706991@qq.com"
+        let e: ValidationError;
+        try {
+            validate(Customer, c)
+        } catch (err) {
+            e = err
+        }
+        assert(e == undefined, e ? ValidationErrorType[e.type] : "no ValidationError")
+    });
+
+    it("no named rule", () => {        
+        addRule("email", { pattern: /^\S+@\S+\.\S+$/, maxLength: 30, trim: true })
+        class Customer
+        {
+            @validator("email1")
+            email: string;
+        }
+        const c = new Customer();
+        c.email = "200706991@qq.com"
+        let e: ValidationError;
+        try {
+            validate(Customer, c)
+        } catch (err) {
+            e = err
+        }
+        assert(e.type == ValidationErrorType.NoRule, e ? ValidationErrorType[e.type] : "no ValidationError")
     });
 });
