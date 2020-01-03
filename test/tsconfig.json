@@ -4,7 +4,6 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "module": "commonjs",
-    "typeRoots": ["../node_modules/@types"],
     "experimentalDecorators": true,
   },
   "include": [

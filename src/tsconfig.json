@@ -5,7 +5,6 @@
     "module": "commonjs",
     "sourceMap": true,
     "declaration": false,
-    "typeRoots": ["../node_modules/@types"],
   },
   "include": [
     "**/*.ts"

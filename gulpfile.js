@@ -22,7 +22,7 @@ gulp.task("build:src-release", () => gulp
     .pipe(gulp.dest("lib")));
 
 gulp.task("build:src", () => gulp
-    .src(["src/index.ts"])
+    .src(["src/**/*.ts"])
     .pipe(src())
     .pipe(gulp.dest("src")));
 
