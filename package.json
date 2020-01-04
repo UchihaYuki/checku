@@ -1,12 +1,14 @@
 {
   "name": "checku",
-  "version": "0.1.5",
+  "version": "0.2.1",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "prepublishOnly": "gulp prepublish",
-    "test": "gulp test"
+    "test": "gulp test",
+    "build-src": "gulp build:src",
+    "build-test": "gulp build:test"
   },
   "repository": {
     "type": "git",
@@ -26,7 +28,8 @@
     "del": "^5.1.0",
     "gulp": "^4.0.2",
     "gulp-mocha": "^7.0.2",
-    "gulp-tsb": "^4.0.5",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-typescript": "^6.0.0-alpha.1",
     "mocha": "^6.2.2",
     "reflect-metadata": "^0.1.13",
     "typescript": "^3.7.4"

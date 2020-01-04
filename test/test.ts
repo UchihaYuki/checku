@@ -2,197 +2,312 @@ import { validator, validate, ValidationError, ValidationErrorType, addRule } fr
 import { assert } from 'chai';
 
 describe("test checku", () => {
-    class LoginRequest {
-        @validator({ pattern: /^\S+@\S+\.\S+$/, maxLength: 30, trim: true })
-        email: string;
-        @validator({ minLength: 8, maxLength: 20 })
-        password: string;
-        @validator({bsonBytes: 20})
-        hobbies: string[];
-    }
+    describe("#minLength maxLength length pattern bsonMaxBytes trim required namedRule customRule defaultRule", function () {
+        it("minLength", () => {
+            class Example {
+                @validator({ minLength: 10 })
+                property: string;
+            }
+            const e = { property: '1234567890' };
+            validate(Example, e)
+        });
 
-    it("all properties valid", () => {        
-        const lr = new LoginRequest();
-        lr.email = "200706991@qq.com";
-        lr.password = "12345678"
-        lr.hobbies = ["play"]
-        let e;
-        try {
-            validate(LoginRequest, lr)
-        } catch (err) {
-            e = err
-        }
-        assert(e == undefined)
-    });
+        it("maxLength", () => {
+            class Example {
+                @validator({ maxLength: 10 })
+                property: string;
+            }
+            const e = { property: '1234567890' };
+            validate(Example, e)
+        });
 
-    it("min length", () => {        
-        const lr = new LoginRequest();
-        lr.email = "200706991@qq.com";
-        lr.password = "1234567"
-        lr.hobbies = ["play"]
-        let e: ValidationError;
-        try {
-            validate(LoginRequest, lr)
-        } catch (err) {
-            e = err
-        }
-        assert(e && e.type == ValidationErrorType.MinLength, e ? ValidationErrorType[e.type] : "no ValidationError")
-    });
+        it("length", () => {
+            class Example {
+                @validator({ length: 10 })
+                property: string;
+            }
+            const e = { property: '1234567890' };
+            validate(Example, e)
+        });
 
-    it("max length", () => {        
-        const lr = new LoginRequest();
-        lr.email = "200706991@qq.com";
-        lr.password = "123456789012345678901"
-        lr.hobbies = ["play"]
-        let e: ValidationError;
-        try {
-            validate(LoginRequest, lr)
-        } catch (err) {
-            e = err
-        }
-        assert(e && e.type == ValidationErrorType.MaxLength, e ? ValidationErrorType[e.type] : "no ValidationError")
-    });
+        it("pattern", () => {
+            class Example {
+                @validator({ pattern: /abc/ })
+                property: string;
+            }
+            const e = { property: '123abc321' };
+            validate(Example, e)
+        });
 
-    it("pattern", () => {        
-        const lr = new LoginRequest();
-        lr.email = "200706991@qqcom";
-        lr.password = "123456789012345678901"
-        lr.hobbies = ["play"]
-        let e: ValidationError;
-        try {
-            validate(LoginRequest, lr)
-        } catch (err) {
-            e = err
-        }
-        assert(e && e.type == ValidationErrorType.Pattern, e ? ValidationErrorType[e.type] : "no ValidationError")
-    });
+        it("bsonMaxBytes", () => {
+            class Example {
+                @validator({ bsonMaxBytes: 20 })
+                property: string;
+            }
+            const e = { property: ['1'] };
+            validate(Example, e)
+        });
 
-    it("required", () => {        
-        const lr = new LoginRequest();
-        lr.email = "200706991@qq.com";
-        lr.hobbies = ["play"]
-        let e: ValidationError;
-        try {
-            validate(LoginRequest, lr)
-        } catch (err) {
-            e = err
-        }
-        assert(e && e.type == ValidationErrorType.Required, e ? ValidationErrorType[e.type] : "no ValidationError")
-    });
+        it("trime", () => {
+            class Example {
+                @validator({ trim: true })
+                property: string;
+            }
+            const e = { property: ' 1234567890 ' };
+            validate(Example, e)
+            assert(e.property == '1234567890')
+        });
 
-    it("trim", () => {        
-        const lr = new LoginRequest();
-        lr.email = "  200706991@qq.com  ";
-        lr.password = "12345678";        
-        lr.hobbies = ["play"]
-        let e: ValidationError;
-        try {
-            validate(LoginRequest, lr)
-        } catch (err) {
-            e = err
-        }
-        assert(lr.email == "200706991@qq.com")
-    });
+        it("required", () => {
+            class Example {
+                @validator({ required: true })
+                property: string;
+            }
+            const e = { property: '1234567890' };
+            validate(Example, e)
+        });
 
-    it("bson bytes", () => {        
-        const lr = new LoginRequest();
-        lr.email = "200706991@qq.com";
-        lr.password = "12345678";
-        lr.hobbies = ["play", "play", "play", "play", "play"]
-        let e: ValidationError;
-        try {
-            validate(LoginRequest, lr)
-        } catch (err) {
-            e = err
-        }
-        assert(e && e.type == ValidationErrorType.Bsonbytes, e ? ValidationErrorType[e.type] : "no ValidationError")
-    });
+        it("namedRule", () => {
+            addRule("email", { pattern: /^\S+@\S+\.\S+$/, maxLength: 30, trim: true })
+            class Example {
+                @validator('email')
+                property: string;
+            }
+            const e = { property: ' 200706991@qq.com ' };
+            validate(Example, e)
+            assert(e.property == '200706991@qq.com')
+        });
 
-    class User
-    {
-        @validator({trim: true})
-        fullName: any;
-        @validator({minLength: 2})
-        firstName: any;
-        @validator({maxLength: 10})
-        lastName: any;
-    }
+        it("namedRule2", () => {
+            addRule("email", (value: string) => {
+                if (new RegExp(/^\S+@\S+\.\S+$/).test(value)) {
+                    return value;
+                }
+                return false;
+            })
+            class Example {
+                @validator('email')
+                property: string;
+            }
+            const e = { property: '200706991@qq.com' };
+            validate(Example, e)
+            assert(e.property == '200706991@qq.com')
+        });
 
-    it("type1", () => {        
-        const u = new User();
-        u.fullName = 1;
-        u.firstName = "xue";
-        u.lastName = "zhang"
-        let e: ValidationError;
-        try {
-            validate(User, u)
-        } catch (err) {
-            e = err
-        }
-        assert(e && e.type == ValidationErrorType.Type, e ? ValidationErrorType[e.type] : "no ValidationError")
-    });
+        it("customRule", () => {
+            class Example {
+                @validator((value: string) => value.length > 2)
+                property: string;
+            }
+            const e = { property: '1234567890' };
+            validate(Example, e)
+        });
 
-    it("type2", () => {        
-        const u = new User();
-        u.fullName = "zhang xue";
-        u.firstName = 1;
-        u.lastName = "zhang"
-        let e: ValidationError;
-        try {
-            validate(User, u)
-        } catch (err) {
-            e = err
-        }
-        assert(e && e.type == ValidationErrorType.Type, e ? ValidationErrorType[e.type] : "no ValidationError")
-    });
+        it("defaultRule", () => {
+            class Example {
+                @validator()
+                property: string;
+            }
+            const e = { property: '1234567890' };
+            validate(Example, e)
+        });
+    })
 
-    it("type3", () => {        
-        const u = new User();
-        u.fullName = "zhang xue";
-        u.firstName = "xue";
-        u.lastName = 3;
-        let e: ValidationError;
-        try {
-            validate(User, u)
-        } catch (err) {
-            e = err
-        }
-        assert(e && e.type == ValidationErrorType.Type, e ? ValidationErrorType[e.type] : "no ValidationError")
-    });
+    describe("error#minLength maxLength length pattern bsonMaxBytes trim required namedRule customRule defaultRule", function () {
+        it("minLength", () => {
+            class Example {
+                @validator({ minLength: 10 })
+                property: string;
+            }
+            const e = { property: '123456789' };
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.MinLength)
+        });
 
-    it("named rule", () => {        
-        addRule("email", { pattern: /^\S+@\S+\.\S+$/, maxLength: 30, trim: true })
-        class Customer
-        {
-            @validator("email")
-            email: string;
-        }
-        const c = new Customer();
-        c.email = "200706991@qq.com"
-        let e: ValidationError;
-        try {
-            validate(Customer, c)
-        } catch (err) {
-            e = err
-        }
-        assert(e == undefined, e ? ValidationErrorType[e.type] : "no ValidationError")
-    });
+        it("minLength", () => {
+            class Example {
+                @validator({ minLength: 10 })
+                property: any;
+            }
+            const e = { property: 1 };
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.Type)
+        });
 
-    it("no named rule", () => {        
-        addRule("email", { pattern: /^\S+@\S+\.\S+$/, maxLength: 30, trim: true })
-        class Customer
-        {
-            @validator("email1")
-            email: string;
-        }
-        const c = new Customer();
-        c.email = "200706991@qq.com"
-        let e: ValidationError;
-        try {
-            validate(Customer, c)
-        } catch (err) {
-            e = err
-        }
-        assert(e.type == ValidationErrorType.NoRule, e ? ValidationErrorType[e.type] : "no ValidationError")
-    });
+        it("maxLength", () => {
+            class Example {
+                @validator({ maxLength: 10 })
+                property: string;
+            }
+            const e = { property: '12345678901' };
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.MaxLength)
+        });
+
+        it("maxLength2", () => {
+            class Example {
+                @validator({ maxLength: 10 })
+                property: any;
+            }
+            const e = { property: 1 };
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.Type)
+        });
+
+        it("length", () => {
+            class Example {
+                @validator({ length: 10 })
+                property: string;
+            }
+            const e = { property: '123456789' };
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.Length)
+        });
+
+        it("length2", () => {
+            class Example {
+                @validator({ length: 10 })
+                property: any;
+            }
+            const e = { property: 1 };
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.Type)
+        });
+
+        it("pattern", () => {
+            class Example {
+                @validator({ pattern: /abc/ })
+                property: string;
+            }
+            const e = { property: '123ab3c21' };
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.Pattern)
+        });
+
+        it("bsonMaxBytes", () => {
+            class Example {
+                @validator({ bsonMaxBytes: 20 })
+                property: string;
+            }
+            const e = { property: '123' };
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.BsonMaxBytes)
+        });
+
+        it("trim", () => {
+            class Example {
+                @validator({ trim: true })
+                property: any;
+            }
+            const e = { property: 1 };
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.Type)
+        });
+
+        it("required", () => {
+            class Example {
+                @validator({ required: true })
+                property: string;
+            }
+            const e = {};
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.Required)
+        });
+
+        it("namedRule", () => {
+            addRule("email", { pattern: /^\S+@\S+\.\S+$/, maxLength: 30, trim: true })
+            class Example {
+                @validator('email1')
+                property: string;
+            }
+            const e = { property: ' 200706991@qq.com ' };
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.NoRule)
+        });
+
+        it("customRule", () => {
+            class Example {
+                @validator((value: string) => value.length > 20)
+                property: string;
+            }
+            const e = { property: '1234567890' };
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.CustomRule)
+        });
+
+        it("defaultRule", () => {
+            class Example {
+                @validator()
+                property: string;
+            }
+            const e = {};
+            let err: ValidationError;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err && err.type == ValidationErrorType.Required)
+        });
+    })
 });

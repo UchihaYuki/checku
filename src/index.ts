@@ -7,7 +7,9 @@ const prototype_propertyKeys = new WeakMap<Object, (string | symbol)[]>();
 
 const validatorMetadataKey = Symbol("validator");
 
-export function validator(rule: Rule | string) {
+type CustomRule = (value: any) => false | any;
+
+export function validator(rule: Rule | string | CustomRule = {}) {
     return (target: Object, propertyKey: string | symbol) => {
         const pks = prototype_propertyKeys.get(target);
         if (pks) {
@@ -20,8 +22,8 @@ export function validator(rule: Rule | string) {
     }
 }
 
-function getValidator(target: any, propertyKey: string | symbol) {
-    return Reflect.getMetadata(validatorMetadataKey, target, propertyKey) as Rule;
+function getValidator(target: any, propertyKey: string | symbol): Rule | string | CustomRule {
+    return Reflect.getMetadata(validatorMetadataKey, target, propertyKey);
 }
 
 function _validate(key: string | symbol, value: any, rule: Rule) {
@@ -48,15 +50,20 @@ function _validate(key: string | symbol, value: any, rule: Rule) {
         if (value.length > rule.maxLength) throw new ValidationError(key, value, ValidationErrorType.MaxLength, rule)
     }
 
+    if (rule.length != undefined) {
+        if (typeof value != 'string') throw new ValidationError(key, value, ValidationErrorType.Type, rule)
+        if (value.length != rule.length) throw new ValidationError(key, value, ValidationErrorType.Length, rule)
+    }
+
     if (rule.pattern != undefined) {
         if (!rule.pattern.test(value)) throw new ValidationError(key, value, ValidationErrorType.Pattern, rule)
     }
 
-    if (rule.bsonBytes != undefined) {
+    if (rule.bsonMaxBytes != undefined) {
         try {
-            if (bson.serialize(value).length > rule.bsonBytes) throw new ValidationError(key, value, ValidationErrorType.Bsonbytes, rule)
+            if (bson.serialize(value).length > rule.bsonMaxBytes) throw new ValidationError(key, value, ValidationErrorType.BsonMaxBytes, rule)
         } catch (err) {
-            throw new ValidationError(key, value, ValidationErrorType.Bsonbytes, rule)
+            throw new ValidationError(key, value, ValidationErrorType.BsonMaxBytes, rule)
         }
     }
 
@@ -73,11 +80,21 @@ export function validate(type: Function, instance: any) {
     const validatedInstance: any = {};
     for (const pk of pks) {
         const value = instance[pk]
-        let rule = getValidator(type.prototype, pk);        
+        let rule = getValidator(type.prototype, pk);    
+        
         if (typeof rule == 'string')
         {
             rule = rules[rule]
             if (rule == undefined) throw new ValidationError(pk, value, ValidationErrorType.NoRule, undefined);
+        }
+
+        if (typeof rule == 'function')
+        {
+            const customeRule = rule as CustomRule;
+            const t = customeRule(value)
+            if (t == false) throw new ValidationError(pk, value, ValidationErrorType.CustomRule, rule);
+            validatedInstance[pk] = t;
+            continue;
         }
 
         const t = _validate(pk, value, rule);
@@ -86,17 +103,18 @@ export function validate(type: Function, instance: any) {
     return Object.assign(instance, validatedInstance)
 }
 
-const rules: { [name: string]: Rule } = {};
+const rules: { [name: string]: Rule | CustomRule } = {};
 
-export function addRule(name: string, rule: Rule) {
+export function addRule(name: string, rule: Rule | CustomRule) {
     rules[name] = rule;
 }
 
 export class Rule {
     minLength?: number;
     maxLength?: number;
+    length?: number;
     pattern?: RegExp;
-    bsonBytes?: number;
+    bsonMaxBytes?: number;
     trim?: boolean;
     required?: boolean;
 }
@@ -106,7 +124,7 @@ export class ValidationError extends Error {
         public key: string | symbol,
         public value: any,
         public type: ValidationErrorType,
-        public rule: Rule) {
+        public rule: Rule | CustomRule) {
         super(`ValidationError`)
     }
 }
@@ -114,9 +132,11 @@ export class ValidationError extends Error {
 export enum ValidationErrorType {
     MinLength,
     MaxLength,
+    Length,
     Pattern,
-    Bsonbytes,
+    BsonMaxBytes,
     Required,
     Type,
     NoRule,
+    CustomRule
 }

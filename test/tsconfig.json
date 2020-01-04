@@ -1,9 +1,7 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "es5",
-    "noImplicitAny": true,
     "sourceMap": true,
-    "module": "commonjs",
     "experimentalDecorators": true,
   },
   "include": [
