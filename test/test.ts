@@ -1,11 +1,11 @@
-import { validator, validate, ValidationError, ValidationErrorType, addRule } from '../src/index';
+import { Validator, validate, ValidationError, ValidationErrorType, addRule } from '../src/index';
 import { assert } from 'chai';
 
 describe("test checku", () => {
     describe("#minLength maxLength length pattern bsonMaxBytes trim required namedRule customRule defaultRule", function () {
         it("minLength", () => {
             class Example {
-                @validator({ minLength: 10 })
+                @Validator({ minLength: 10 })
                 property: string;
             }
             const e = { property: '1234567890' };
@@ -14,7 +14,7 @@ describe("test checku", () => {
 
         it("maxLength", () => {
             class Example {
-                @validator({ maxLength: 10 })
+                @Validator({ maxLength: 10 })
                 property: string;
             }
             const e = { property: '1234567890' };
@@ -23,7 +23,7 @@ describe("test checku", () => {
 
         it("length", () => {
             class Example {
-                @validator({ length: 10 })
+                @Validator({ length: 10 })
                 property: string;
             }
             const e = { property: '1234567890' };
@@ -32,7 +32,7 @@ describe("test checku", () => {
 
         it("pattern", () => {
             class Example {
-                @validator({ pattern: /abc/ })
+                @Validator({ pattern: /abc/ })
                 property: string;
             }
             const e = { property: '123abc321' };
@@ -41,7 +41,7 @@ describe("test checku", () => {
 
         it("bsonMaxBytes", () => {
             class Example {
-                @validator({ bsonMaxBytes: 20 })
+                @Validator({ bsonMaxBytes: 20 })
                 property: string;
             }
             const e = { property: ['1'] };
@@ -50,7 +50,7 @@ describe("test checku", () => {
 
         it("trime", () => {
             class Example {
-                @validator({ trim: true })
+                @Validator({ trim: true })
                 property: string;
             }
             const e = { property: ' 1234567890 ' };
@@ -60,7 +60,7 @@ describe("test checku", () => {
 
         it("required", () => {
             class Example {
-                @validator({ required: true })
+                @Validator({ required: true })
                 property: string;
             }
             const e = { property: '1234567890' };
@@ -70,7 +70,7 @@ describe("test checku", () => {
         it("namedRule", () => {
             addRule("email", { pattern: /^\S+@\S+\.\S+$/, maxLength: 30, trim: true })
             class Example {
-                @validator('email')
+                @Validator('email')
                 property: string;
             }
             const e = { property: ' 200706991@qq.com ' };
@@ -86,7 +86,7 @@ describe("test checku", () => {
                 return false;
             })
             class Example {
-                @validator('email')
+                @Validator('email')
                 property: string;
             }
             const e = { property: '200706991@qq.com' };
@@ -96,7 +96,7 @@ describe("test checku", () => {
 
         it("customRule", () => {
             class Example {
-                @validator((value: string) => value.length > 2)
+                @Validator((value: string) => value.length > 2)
                 property: string;
             }
             const e = { property: '1234567890' };
@@ -105,7 +105,7 @@ describe("test checku", () => {
 
         it("defaultRule", () => {
             class Example {
-                @validator()
+                @Validator()
                 property: string;
             }
             const e = { property: '1234567890' };
@@ -116,7 +116,7 @@ describe("test checku", () => {
     describe("error#minLength maxLength length pattern bsonMaxBytes trim required namedRule customRule defaultRule", function () {
         it("minLength", () => {
             class Example {
-                @validator({ minLength: 10 })
+                @Validator({ minLength: 10 })
                 property: string;
             }
             const e = { property: '123456789' };
@@ -131,7 +131,7 @@ describe("test checku", () => {
 
         it("minLength", () => {
             class Example {
-                @validator({ minLength: 10 })
+                @Validator({ minLength: 10 })
                 property: any;
             }
             const e = { property: 1 };
@@ -146,7 +146,7 @@ describe("test checku", () => {
 
         it("maxLength", () => {
             class Example {
-                @validator({ maxLength: 10 })
+                @Validator({ maxLength: 10 })
                 property: string;
             }
             const e = { property: '12345678901' };
@@ -161,7 +161,7 @@ describe("test checku", () => {
 
         it("maxLength2", () => {
             class Example {
-                @validator({ maxLength: 10 })
+                @Validator({ maxLength: 10 })
                 property: any;
             }
             const e = { property: 1 };
@@ -176,7 +176,7 @@ describe("test checku", () => {
 
         it("length", () => {
             class Example {
-                @validator({ length: 10 })
+                @Validator({ length: 10 })
                 property: string;
             }
             const e = { property: '123456789' };
@@ -191,7 +191,7 @@ describe("test checku", () => {
 
         it("length2", () => {
             class Example {
-                @validator({ length: 10 })
+                @Validator({ length: 10 })
                 property: any;
             }
             const e = { property: 1 };
@@ -206,7 +206,7 @@ describe("test checku", () => {
 
         it("pattern", () => {
             class Example {
-                @validator({ pattern: /abc/ })
+                @Validator({ pattern: /abc/ })
                 property: string;
             }
             const e = { property: '123ab3c21' };
@@ -221,7 +221,7 @@ describe("test checku", () => {
 
         it("bsonMaxBytes", () => {
             class Example {
-                @validator({ bsonMaxBytes: 20 })
+                @Validator({ bsonMaxBytes: 20 })
                 property: string;
             }
             const e = { property: '123' };
@@ -236,7 +236,7 @@ describe("test checku", () => {
 
         it("trim", () => {
             class Example {
-                @validator({ trim: true })
+                @Validator({ trim: true })
                 property: any;
             }
             const e = { property: 1 };
@@ -251,7 +251,7 @@ describe("test checku", () => {
 
         it("required", () => {
             class Example {
-                @validator({ required: true })
+                @Validator({ required: true })
                 property: string;
             }
             const e = {};
@@ -267,7 +267,7 @@ describe("test checku", () => {
         it("namedRule", () => {
             addRule("email", { pattern: /^\S+@\S+\.\S+$/, maxLength: 30, trim: true })
             class Example {
-                @validator('email1')
+                @Validator('email1')
                 property: string;
             }
             const e = { property: ' 200706991@qq.com ' };
@@ -282,7 +282,7 @@ describe("test checku", () => {
 
         it("customRule", () => {
             class Example {
-                @validator((value: string) => value.length > 20)
+                @Validator((value: string) => value.length > 20)
                 property: string;
             }
             const e = { property: '1234567890' };
@@ -297,7 +297,7 @@ describe("test checku", () => {
 
         it("defaultRule", () => {
             class Example {
-                @validator()
+                @Validator()
                 property: string;
             }
             const e = {};

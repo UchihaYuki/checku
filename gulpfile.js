@@ -3,6 +3,7 @@ const del = require("del");
 const mocha = require("gulp-mocha");
 const sourcemaps = require('gulp-sourcemaps')
 const ts = require('gulp-typescript');
+const { exec } = require('child_process')
 
 const src = ts.createProject("src/tsconfig.json");
 const srcRelease = ts.createProject("src/tsconfig-release.json");
@@ -42,6 +43,10 @@ gulp.task("build:src-release", () => gulp
     .pipe(srcRelease())
     .pipe(gulp.dest("lib")));
 
+gulp.task("git-push", (cb) => {
+    exec("push.cmd", cb)
+})
+
 gulp.task("test", gulp.series("clean", "build:src", "build:test", "run:test"));
-gulp.task("prepublish", gulp.series("test", "build:src-release"));
+gulp.task("prepublish", gulp.series("test", "build:src-release", 'git-push'));
 

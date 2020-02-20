@@ -9,7 +9,7 @@ const validatorMetadataKey = Symbol("validator");
 
 type CustomRule = (value: any) => false | any;
 
-export function validator(rule: Rule | string | CustomRule = {}) {
+export function Validator(rule: Rule | string | CustomRule = {}) {
     return (target: Object, propertyKey: string | symbol) => {
         const pks = prototype_propertyKeys.get(target);
         if (pks) {
