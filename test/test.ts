@@ -2,7 +2,26 @@ import { Validator, validate, addRule } from '../src/index';
 import { assert } from 'chai';
 
 describe("test checku", () => {
-    describe("#minLength maxLength length pattern bsonMaxBytes trim required namedRule customRule defaultRule", function () {
+    describe("#required trim minLength maxLength length pattern gt gte lt lte eq namedRule customRule defaultRule", function () {
+        it("required", () => {
+            class Example {
+                @Validator({ required: true })
+                property: string;
+            }
+            const e = { property: '1234567890' };
+            validate(Example, e)
+        });
+
+        it("trim", () => {
+            class Example {
+                @Validator({ trim: true })
+                property: string;
+            }
+            const e = { property: ' 1234567890 ' };
+            validate(Example, e)
+            assert(e.property == '1234567890')
+        });
+
         it("minLength", () => {
             class Example {
                 @Validator({ minLength: 10 })
@@ -39,22 +58,93 @@ describe("test checku", () => {
             validate(Example, e)
         });
 
-        it("trime", () => {
+        it("gt1", () => {
             class Example {
-                @Validator({ trim: true })
-                property: string;
+                @Validator({ gt: 10 })
+                property: number;
             }
-            const e = { property: ' 1234567890 ' };
+            const e = { property: 11 };
             validate(Example, e)
-            assert(e.property == '1234567890')
         });
 
-        it("required", () => {
+        it("gt2", () => {
             class Example {
-                @Validator({ required: true })
+                @Validator({ gt: 'a' })
                 property: string;
             }
-            const e = { property: '1234567890' };
+            const e = { property: 'b' };
+            validate(Example, e)
+        });
+
+        it("gte1", () => {
+            class Example {
+                @Validator({ gte: 10 })
+                property: number;
+            }
+            const e = { property: 11 };
+            validate(Example, e)
+        });
+
+        it("gte2", () => {
+            class Example {
+                @Validator({ gte: 'a' })
+                property: string;
+            }
+            const e = { property: 'b' };
+            validate(Example, e)
+        });
+
+        it("lt1", () => {
+            class Example {
+                @Validator({ lt: 10 })
+                property: number;
+            }
+            const e = { property: 9 };
+            validate(Example, e)
+        });
+
+        it("lt2", () => {
+            class Example {
+                @Validator({ lt: 'b' })
+                property: string;
+            }
+            const e = { property: 'a' };
+            validate(Example, e)
+        });
+
+        it("lte1", () => {
+            class Example {
+                @Validator({ lte: 10 })
+                property: number;
+            }
+            const e = { property: 10 };
+            validate(Example, e)
+        });
+
+        it("lte2", () => {
+            class Example {
+                @Validator({ lte: 'a' })
+                property: string;
+            }
+            const e = { property: 'a' };
+            validate(Example, e)
+        });
+
+        it("eq1", () => {
+            class Example {
+                @Validator({ eq: 1 })
+                property: number;
+            }
+            const e = { property: 1 };
+            validate(Example, e)
+        });
+
+        it("eq2", () => {
+            class Example {
+                @Validator({ eq: 'a' })
+                property: string;
+            }
+            const e = { property: 'a' };
             validate(Example, e)
         });
 
@@ -104,7 +194,37 @@ describe("test checku", () => {
         });
     })
 
-    describe("error#minLength maxLength length pattern bsonMaxBytes trim required namedRule customRule defaultRule", function () {
+    describe("error#required trim minLength maxLength length pattern gt gte lt lte eq namedRule customRule defaultRule", function () {
+        it("required", () => {
+            class Example {
+                @Validator({ required: true })
+                property: string;
+            }
+            const e = {};
+            let err: Error;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err)
+        });
+
+        it("trim", () => {
+            class Example {
+                @Validator({ trim: true })
+                property: any;
+            }
+            const e = { property: 1 };
+            let err: Error;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err)
+        });
+
         it("minLength", () => {
             class Example {
                 @Validator({ minLength: 10 })
@@ -210,12 +330,12 @@ describe("test checku", () => {
             assert(err)
         });
 
-        it("trim", () => {
+        it("gt1", () => {
             class Example {
-                @Validator({ trim: true })
-                property: any;
+                @Validator({ gt: 10 })
+                property: number;
             }
-            const e = { property: 1 };
+            const e = { property: 10 };
             let err: Error;
             try {
                 validate(Example, e)
@@ -225,12 +345,132 @@ describe("test checku", () => {
             assert(err)
         });
 
-        it("required", () => {
+        it("gt2", () => {
             class Example {
-                @Validator({ required: true })
+                @Validator({ gt: 'a' })
                 property: string;
             }
-            const e = {};
+            const e = { property: 'a' };
+            let err: Error;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err)
+        });
+
+        it("gte1", () => {
+            class Example {
+                @Validator({ gte: 10 })
+                property: number;
+            }
+            const e = { property: 9 };
+            let err: Error;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err)
+        });
+
+        it("gte2", () => {
+            class Example {
+                @Validator({ gte: 'a' })
+                property: string;
+            }
+            const e = { property: 'A' };
+            let err: Error;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err)
+        });
+
+        it("lt1", () => {
+            class Example {
+                @Validator({ lt: 10 })
+                property: number;
+            }
+            const e = { property: 11 };
+            let err: Error;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err)
+        });
+
+        it("lt2", () => {
+            class Example {
+                @Validator({ lt: 'b' })
+                property: string;
+            }
+            const e = { property: 'b' };
+            let err: Error;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err)
+        });
+
+        it("lte1", () => {
+            class Example {
+                @Validator({ lte: 10 })
+                property: number;
+            }
+            const e = { property: 11 };
+            let err: Error;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err)
+        });
+
+        it("lte2", () => {
+            class Example {
+                @Validator({ lte: 'a' })
+                property: string;
+            }
+            const e = { property: 'b' };
+            let err: Error;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err)
+        });
+
+        it("eq1", () => {
+            class Example {
+                @Validator({ eq: 1 })
+                property: number;
+            }
+            const e = { property: 2 };
+            let err: Error;
+            try {
+                validate(Example, e)
+            } catch (error) {
+                err = error
+            }
+            assert(err)
+        });
+
+        it("eq2", () => {
+            class Example {
+                @Validator({ eq: 'a' })
+                property: string;
+            }
+            const e = { property: 'b' };
             let err: Error;
             try {
                 validate(Example, e)
