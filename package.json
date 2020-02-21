@@ -1,6 +1,6 @@
 {
   "name": "checku",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/UchihaYuki/checku#readme",
   "devDependencies": {
-    "@types/bson": "^4.0.1",
     "@types/chai": "^4.2.7",
     "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
@@ -31,11 +30,12 @@
     "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^6.0.0-alpha.1",
     "mocha": "^6.2.2",
-    "reflect-metadata": "^0.1.13",
     "typescript": "^3.7.4"
   },
+  "peerDependencies": {    
+    "reflect-metadata": "^0.1.13"
+  },
   "dependencies": {
-    "bson": "^4.0.2"
   },
   "files": [
     "lib",

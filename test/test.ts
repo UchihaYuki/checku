@@ -1,4 +1,4 @@
-import { Validator, validate, ValidationError, ValidationErrorType, addRule } from '../src/index';
+import { Validator, validate, addRule } from '../src/index';
 import { assert } from 'chai';
 
 describe("test checku", () => {
@@ -36,15 +36,6 @@ describe("test checku", () => {
                 property: string;
             }
             const e = { property: '123abc321' };
-            validate(Example, e)
-        });
-
-        it("bsonMaxBytes", () => {
-            class Example {
-                @Validator({ bsonMaxBytes: 20 })
-                property: string;
-            }
-            const e = { property: ['1'] };
             validate(Example, e)
         });
 
@@ -96,7 +87,7 @@ describe("test checku", () => {
 
         it("customRule", () => {
             class Example {
-                @Validator((value: string) => value.length > 2)
+                @Validator((value: string) => assert(value.length > 2))
                 property: string;
             }
             const e = { property: '1234567890' };
@@ -120,13 +111,13 @@ describe("test checku", () => {
                 property: string;
             }
             const e = { property: '123456789' };
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.MinLength)
+            assert(err)
         });
 
         it("minLength", () => {
@@ -135,13 +126,13 @@ describe("test checku", () => {
                 property: any;
             }
             const e = { property: 1 };
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.Type)
+            assert(err)
         });
 
         it("maxLength", () => {
@@ -150,13 +141,13 @@ describe("test checku", () => {
                 property: string;
             }
             const e = { property: '12345678901' };
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.MaxLength)
+            assert(err)
         });
 
         it("maxLength2", () => {
@@ -165,13 +156,13 @@ describe("test checku", () => {
                 property: any;
             }
             const e = { property: 1 };
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.Type)
+            assert(err)
         });
 
         it("length", () => {
@@ -180,13 +171,13 @@ describe("test checku", () => {
                 property: string;
             }
             const e = { property: '123456789' };
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.Length)
+            assert(err)
         });
 
         it("length2", () => {
@@ -195,13 +186,13 @@ describe("test checku", () => {
                 property: any;
             }
             const e = { property: 1 };
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.Type)
+            assert(err)
         });
 
         it("pattern", () => {
@@ -210,28 +201,13 @@ describe("test checku", () => {
                 property: string;
             }
             const e = { property: '123ab3c21' };
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.Pattern)
-        });
-
-        it("bsonMaxBytes", () => {
-            class Example {
-                @Validator({ bsonMaxBytes: 20 })
-                property: string;
-            }
-            const e = { property: '123' };
-            let err: ValidationError;
-            try {
-                validate(Example, e)
-            } catch (error) {
-                err = error
-            }
-            assert(err && err.type == ValidationErrorType.BsonMaxBytes)
+            assert(err)
         });
 
         it("trim", () => {
@@ -240,13 +216,13 @@ describe("test checku", () => {
                 property: any;
             }
             const e = { property: 1 };
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.Type)
+            assert(err)
         });
 
         it("required", () => {
@@ -255,13 +231,13 @@ describe("test checku", () => {
                 property: string;
             }
             const e = {};
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.Required)
+            assert(err)
         });
 
         it("namedRule", () => {
@@ -271,28 +247,28 @@ describe("test checku", () => {
                 property: string;
             }
             const e = { property: ' 200706991@qq.com ' };
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.NoRule)
+            assert(err)
         });
 
         it("customRule", () => {
             class Example {
-                @Validator((value: string) => value.length > 20)
+                @Validator((value: string) => assert(value.length > 20))
                 property: string;
             }
             const e = { property: '1234567890' };
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.CustomRule)
+            assert(err)
         });
 
         it("defaultRule", () => {
@@ -301,13 +277,13 @@ describe("test checku", () => {
                 property: string;
             }
             const e = {};
-            let err: ValidationError;
+            let err: Error;
             try {
                 validate(Example, e)
             } catch (error) {
                 err = error
             }
-            assert(err && err.type == ValidationErrorType.Required)
+            assert(err)
         });
     })
 });
